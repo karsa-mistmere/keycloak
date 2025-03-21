@@ -164,6 +164,32 @@ public class OrganizationsResource {
     }
 
     /**
+     * Returns the count of organizations.
+     *
+     * @param search a {@code String} representing either an organization name or domain.
+     * @return a {@code Map} containing the count of organizations.
+     */
+    @GET
+    @NoCache
+    @Path("count")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Tag(name = KeycloakOpenAPI.Admin.Tags.ORGANIZATIONS)
+    @Operation(summary = "Returns the count of organizations")
+    @APIResponses(value = {
+        @APIResponse(responseCode = "200", description = "", content = @Content(schema = @Schema(implementation = Map.class))),
+        @APIResponse(responseCode = "403", description = "Forbidden")
+    })
+    public Map<String, Long> getOrganizationCount(@QueryParam("search") String search) {
+        auth.realm().requireManageRealm();
+        Organizations.checkEnabled(provider);
+
+        Map<String, Long> map = new HashMap<>();
+        long count = provider.getCount(search);
+        map.put("count", count);
+        return map;
+    }
+
+    /**
      * Base path for the admin REST API for one particular organization.
      */
     @Path("{org-id}")
